@@ -51,10 +51,10 @@ STATUS_NOT_RUNNING=3
 
 ERROR_PROGRAM_NOT_INSTALLED=5
 
-FLUME_LOG_DIR=/var/log/flume-ng
-FLUME_CONF_DIR=/usr/local/lib/flume-ng/conf
+FLUME_LOG_DIR=<%= flume_logs_dir %>
 FLUME_RUN_DIR=/var/run/flume-ng
-FLUME_HOME=/usr/local/lib/flume-ng
+FLUME_HOME=<%= flume_home %>-<%= flume_version %>
+FLUME_CONF_DIR=${FLUME_HOME}/conf
 FLUME_USER=root
 
 FLUME_CONF_FILE=${FLUME_CONF_DIR}/flume-agent.conf
@@ -67,9 +67,6 @@ desc="Flume NG agent daemon"
 FLUME_CONF_FILE=${FLUME_CONF_FILE:-${FLUME_CONF_DIR}/flume.conf}
 EXEC_PATH=${FLUME_HOME}/bin/flume-ng
 FLUME_PID_FILE=${FLUME_RUN_DIR}/flume-ng-${FLUME_AGENT_NAME}.pid
-
-GANGLIA_IP=239.2.11.71
-GANGLIA_PORT=8649
 
 # These directories may be tmpfs and may or may not exist
 # depending on the OS (ex: /var/lock/subsys does not exist on debian/ubuntu)
@@ -91,7 +88,7 @@ start() {
   fi
 
   log_success_msg "Starting $desc (flume-ng-agent): "
-  /bin/su -s /bin/bash -c "/bin/bash -c 'echo \$\$ >${FLUME_PID_FILE} && exec ${EXEC_PATH} agent --conf $FLUME_CONF_DIR --conf-file $FLUME_CONF_FILE --name $FLUME_AGENT_NAME -Dflume.monitoring.type=GANGLIA -Dflume.monitoring.hosts=${GANGLIA_IP}:${GANGLIA_PORT} >>${FLUME_LOG_DIR}/flume.init.log 2>&1' &" $FLUME_USER
+  /bin/su -s /bin/bash -c "/bin/bash -c 'echo \$\$ >${FLUME_PID_FILE} && exec ${EXEC_PATH} agent --conf $FLUME_CONF_DIR --conf-file $FLUME_CONF_FILE --name $FLUME_AGENT_NAME >>${FLUME_LOG_DIR}/flume.init.log 2>&1' &" $FLUME_USER
   RETVAL=$?
   [ $RETVAL -eq 0 ] && touch $LOCKFILE
   return $RETVAL

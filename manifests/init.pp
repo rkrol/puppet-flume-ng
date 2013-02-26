@@ -1,6 +1,7 @@
 class flume-ng (
     $flume_version = "1.3.1",
-    $flume_home = "/opt/flume-ng) {
+    $flume_home = "/opt/flume-ng",
+    $flume_logs_dir = "/var/log/flume-ng/") {
 
   exec { "download_flume":
     command => "wget -O /tmp/flume.tar.gz http://apache.mirrors.timporter.net/flume/${flume_version}/apache-flume-${flume_version}-bin.tar.gz",
@@ -9,7 +10,7 @@ class flume-ng (
   }
 
   exec { "unpack_flume" :
-    command => "tar -zxf /tmp/flume.tar.gz -C /opt && mv /opt/apache-flume-${flume_version} ${flume_home}-${flume_version}",
+    command => "tar -zxf /tmp/flume.tar.gz -C /opt && mv /opt/apache-flume-${flume_version}-bin ${flume_home}-${flume_version}",
     path    => $path,
     creates => "${flume_home}-${flume_version}",
     require => Exec["download_flume"]
@@ -22,14 +23,39 @@ class flume-ng (
     require => Exec["unpack_flume"]
   }
 
-  file {
-    "/etc/profile.d/flume-ng.sh":
-      source  => "puppet:///modules/flume/etc/profile.d/flume-ng.sh",
-      require => Exec["unpack_flume"];
+  file { "/etc/profile.d/flume-ng.sh":
+    content => template("flume-ng/etc/profile.d/flume-ng.sh.erb"),
+    require => Exec["unpack_flume"];
+  }
 
-    "${flume_home}-${flume_version}/conf/flume-env.sh":
-      source  => "puppet:///modules/flume/flume-env.sh",
-      require => Exec["unpack_flume"];
+  file { "/etc/init.d/flume-ng-agent":
+    content => template("flume-ng/etc/init.d/flume-ng-agent.erb"),
+    require => Exec["unpack_flume"];
+  }
+
+  file { "${flume_home}-${flume_version}/conf/log4j.properties":
+    content => template("flume-ng/log4j.properties.erb"),
+    require => Exec["unpack_flume"];
+  }
+
+  file { "${flume_home}-${flume_version}/conf/flume-env.sh":
+    source  => "puppet:///modules/flume-ng/flume-env.sh",
+    owner   => root,
+    require => Exec["unpack_flume"];
+  }
+
+  file { "/var/run/flume-ng" :
+    recurse => true,
+    owner   => root,
+    group   => root,
+    require => Exec["unpack_flume"]
+  }
+
+  file { "${flume_logs_dir}" :
+    recurse => true,
+    owner   => root,
+    group   => root,
+    require => Exec["unpack_flume"]
   }
 
 }
