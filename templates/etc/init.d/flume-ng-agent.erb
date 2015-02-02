@@ -51,9 +51,9 @@ STATUS_NOT_RUNNING=3
 
 ERROR_PROGRAM_NOT_INSTALLED=5
 
-FLUME_LOG_DIR=<%= flume_logs_dir %>
+FLUME_LOG_DIR=<%= @flume_logs_dir %>
 FLUME_RUN_DIR=/var/run/flume-ng
-FLUME_HOME=<%= flume_home %>-<%= flume_version %>
+FLUME_HOME=<%= @flume_home %>-<%= @flume_version %>
 FLUME_CONF_DIR=${FLUME_HOME}/conf
 FLUME_USER=root
 
