@@ -30,6 +30,7 @@ class flume-ng (
 
   file { "/etc/init.d/flume-ng-agent":
     content => template("flume-ng/etc/init.d/flume-ng-agent.erb"),
+    mode => '0755',
     require => Exec["unpack_flume"];
   }
 
