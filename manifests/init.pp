@@ -1,10 +1,10 @@
 class flume-ng (
-    $flume_version = "1.3.1",
+    $flume_version = "1.5.2",
     $flume_home = "/opt/flume-ng",
     $flume_logs_dir = "/var/log/flume-ng/") {
 
   exec { "download_flume":
-    command => "wget -O /tmp/flume.tar.gz http://apache.mirrors.timporter.net/flume/${flume_version}/apache-flume-${flume_version}-bin.tar.gz",
+    command => "wget -O /tmp/flume.tar.gz http://mirror.switch.ch/mirror/apache/dist/flume/${flume_version}/apache-flume-${flume_version}-bin.tar.gz",
     path    => $path,
     unless  => "ls /opt | grep flume-${flume_version}",
   }
@@ -30,6 +30,7 @@ class flume-ng (
 
   file { "/etc/init.d/flume-ng-agent":
     content => template("flume-ng/etc/init.d/flume-ng-agent.erb"),
+    mode => '0755',
     require => Exec["unpack_flume"];
   }
 
